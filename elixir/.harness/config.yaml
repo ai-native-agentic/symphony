@@ -1,0 +1,20 @@
+project_name: symphony-elixir
+language: elixir
+include_paths:
+  - lib
+gates:
+  gate_a:
+    enabled: true
+    tools:
+      mix_format_enabled: true
+      credo_enabled: true
+  gate_b:
+    enabled: false
+  gate_c:
+    enabled: false
+  gate_d:
+    enabled: false
+  gate_e:
+    enabled: false
+  gate_f:
+    enabled: false
