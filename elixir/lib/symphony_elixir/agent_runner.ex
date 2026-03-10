@@ -4,7 +4,9 @@ defmodule SymphonyElixir.AgentRunner do
   """
 
   require Logger
+  alias SymphonyElixir.Agenthub.Client, as: AgenthubClient
   alias SymphonyElixir.Codex.AppServer
+  alias SymphonyElixir.Harness.Runner, as: HarnessRunner
   alias SymphonyElixir.{Config, Linear.Issue, PromptBuilder, Tracker, Workspace}
 
   @spec run(map(), pid() | nil, keyword()) :: :ok | no_return()
@@ -150,5 +152,58 @@ defmodule SymphonyElixir.AgentRunner do
 
   defp issue_context(%Issue{id: issue_id, identifier: identifier}) do
     "issue_id=#{issue_id} issue_identifier=#{identifier}"
+  end
+
+  defp push_to_agenthub(workspace) do
+    bundle_path = Path.join(System.tmp_dir!(), "bundle-#{:rand.uniform(999_999)}.bundle")
+
+    case System.cmd("git", ["bundle", "create", bundle_path, "HEAD"],
+           cd: workspace,
+           stderr_to_stdout: true
+         ) do
+      {_output, 0} ->
+        bundle_data = File.read!(bundle_path)
+        File.rm(bundle_path)
+
+        case AgenthubClient.push_bundle(bundle_data) do
+          {:ok, hash} ->
+            Logger.info("Pushed bundle to Agenthub: #{hash}")
+            {:ok, hash}
+
+          {:error, reason} ->
+            Logger.error("Agenthub push failed: #{reason}")
+            {:error, reason}
+        end
+
+      {output, exit_code} ->
+        Logger.error("git bundle create failed (exit #{exit_code}): #{output}")
+        {:error, "git bundle failed (exit #{exit_code}): #{output}"}
+    end
+  end
+
+  defp maybe_run_harness(workspace) do
+    if Application.get_env(:symphony_elixir, :harness_enabled, false) do
+      _gates_path =
+        Application.get_env(
+          :symphony_elixir,
+          :harness_script_path,
+          "/home/lunark/projects/ai-native-agentic-org/harness-engineering/.harness/run-gates.sh"
+        )
+
+      Logger.info("Running Harness gates on workspace: #{workspace}")
+
+      case HarnessRunner.run_gates(workspace, %{}) do
+        {:ok, %{overall: overall} = results} ->
+          Logger.info("Harness gates result: #{overall}")
+          {:ok, results}
+
+        {:error, reason} ->
+          Logger.error("Harness gates error: #{reason}")
+          {:error, reason}
+      end
+    else
+      Logger.info("Harness gates disabled, skipping")
+      {:ok, :skipped}
+    end
   end
 end
