@@ -1,0 +1,26 @@
+name: symphony CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-elixir@v1
+        with:
+          elixir-version: "1.19"
+          otp-version: "28"
+      - name: Install dependencies
+        working-directory: elixir
+        run: mix deps.get
+      - name: Compile
+        working-directory: elixir
+        run: mix compile --warnings-as-errors
+      - name: Test
+        working-directory: elixir
+        run: mix test
