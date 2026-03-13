@@ -10,34 +10,23 @@ Stack: Elixir 1.19, OTP 28, Phoenix LiveView 1.1, Bandit HTTP, Req HTTP client, 
 
 ## STRUCTURE
 
-```
 symphony/
-├── SPEC.md                    # Language-agnostic specification (implement in any language)
-├── README.md                  # Overview, running instructions, demo video
-├── LICENSE                    # Apache 2.0
-└── elixir/                    # Reference Elixir/OTP implementation
-    ├── lib/
-    │   ├── symphony_elixir/
-    │   │   ├── application.ex         # OTP Application supervisor
-    │   │   ├── orchestrator.ex        # Main work orchestration (Linear polling)
-    │   │   ├── agent_runner.ex        # Codex App Server launcher + workspace mgmt
-    │   │   ├── workspace.ex           # Isolated workspace creation/cleanup
-    │   │   ├── linear/client.ex       # Linear GraphQL API client
-    │   │   ├── codex/app_server.ex    # Codex App Server integration
-    │   │   ├── codex/dynamic_tool.ex  # Runtime tool injection (linear_graphql)
-    │   │   ├── config.ex              # Config parsing + validation
-    │   │   └── cli.ex                 # CLI entry point (escript)
-    │   └── symphony_elixir_web/
-    │       ├── router.ex              # Phoenix router
-    │       ├── dashboard_live.ex      # LiveView status dashboard
-    │       └── observability_api_controller.ex  # Observability endpoints
-    ├── config/                # Runtime/test/dev config
-    ├── test/                  # ExUnit tests
-    ├── bin/symphony           # Compiled escript binary
-    ├── mix.exs                # Project deps + aliases
-    ├── mise.toml              # Elixir 1.19.5 + Erlang/OTP 28 via mise
-    └── Makefile               # all/setup/build/fmt/lint/test/coverage/dialyzer
-```
+├── elixir/
+│   ├── _build/
+│   ├── bin/
+│   ├── config/
+│   ├── cover/
+│   ├── deps/
+│   ├── docs/
+│   ├── lib/
+│   ├── log/
+│   ├── priv/
+│   ├── test/
+│   ├── AGENTS.md
+│   ├── Makefile
+│   └── README.md
+├── AGENTS.md
+├── README.md
 
 ## WHERE TO LOOK
 
