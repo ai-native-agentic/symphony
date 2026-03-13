@@ -29,4 +29,9 @@ COPY --from=builder /app/_build/prod/rel/symphony_elixir /app
 
 WORKDIR /app
 
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser && \
+    chown -R appuser:appgroup /app
+
+USER appuser
+
 CMD ["bin/symphony_elixir", "start"]
